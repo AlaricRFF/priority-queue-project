@@ -30,12 +30,8 @@ public:
     // Runtime: O(n) where n is number of elements in range.
     template<typename InputIterator>
     BinaryPQ(InputIterator start, InputIterator end, COMP_FUNCTOR comp = COMP_FUNCTOR()) :
-        BaseClass{ comp } {
+        BaseClass{ comp },data{ start, end } {
         // TODO: Implement this function
-
-        for(auto iter = start; iter != end; iter ++){
-            data.push_back(*iter);
-        }
         heapify();
     } // BinaryPQ
 
@@ -96,7 +92,7 @@ public:
     // Runtime: O(1)
     virtual const TYPE &top() const {
         // TODO: Implement this function.
-        return data[data.size() - 1];
+        return data[0];
     } // top()
 
 
@@ -149,7 +145,7 @@ private:
 
     // FixUp, O(log n)
     void fixUp(size_t idx){
-        while( idx > 1 && this->compare(data[idx / 2],data[idx])){
+        while( idx > 1 && this->compare(getElement(idx / 2), getElement(idx))){
             std::swap(getElement(idx), getElement(idx / 2));
             idx /= 2;
         }

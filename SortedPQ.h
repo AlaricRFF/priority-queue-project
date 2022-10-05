@@ -35,18 +35,16 @@ public:
     // TODO: When you implement this function, uncomment the parameter names.
     template<typename InputIterator>
     SortedPQ(InputIterator start, InputIterator end, COMP_FUNCTOR comp = COMP_FUNCTOR()) :
-        BaseClass{ comp } {
+        BaseClass{ comp },data{ start, end } {
         // TODO: Implement this function
-        for(auto iter = start; iter != end; iter++){
-            data.push_back(*start);
-        }
+
         // sort
         std::sort(data.begin(),data.end(),this->compare);
 
     } // SortedPQ
 
     /// DEBUG FUNCTION
-    BinaryPQ(const std::vector<TYPE>& v, COMP_FUNCTOR comp = COMP_FUNCTOR()):
+    explicit SortedPQ(const std::vector<TYPE>& v, COMP_FUNCTOR comp = COMP_FUNCTOR()):
             BaseClass{ comp } {
         std::vector<TYPE> temp(v.begin(),v.end());
         data = temp;
@@ -69,12 +67,13 @@ public:
         if (lb == data.end())
             data.push_back(val);
         else{ // insert at middle [.begin(), lb), [lb, .end())
-            std::vector<TYPE> front(data.begin(),lb);
-            std::vector<TYPE> end(lb,data.end());
-            front.push_back(val);
-            front.reserve(front.size() + end.size());
-            front.insert(front.end(),end.begin(),end.end());
-            data = front;
+            data.insert(lb,val);
+//            std::vector<TYPE> front(data.begin(),lb);
+//            std::vector<TYPE> end(lb,data.end());
+//            front.push_back(val);
+//            front.reserve(front.size() + end.size());
+//            front.insert(front.end(),end.begin(),end.end());
+//            data = front;
         }
     } // push()
 

@@ -37,8 +37,21 @@ public:
     SortedPQ(InputIterator start, InputIterator end, COMP_FUNCTOR comp = COMP_FUNCTOR()) :
         BaseClass{ comp } {
         // TODO: Implement this function
+        for(auto iter = start; iter != end; iter++){
+            data.push_back(*start);
+        }
+        // sort
+        std::sort(data.begin(),data.end(),this->compare);
 
     } // SortedPQ
+
+    /// DEBUG FUNCTION
+    BinaryPQ(const std::vector<TYPE>& v, COMP_FUNCTOR comp = COMP_FUNCTOR()):
+            BaseClass{ comp } {
+        std::vector<TYPE> temp(v.begin(),v.end());
+        data = temp;
+        std::sort(data.begin(),data.end(), this->compare);
+    }
 
 
     // Description: Destructor doesn't need any code, the data vector will
@@ -51,9 +64,18 @@ public:
     // Runtime: O(n)
     virtual void push(const TYPE &val) {
         // TODO: Implement this function
-
-        // This line is present only so that this provided file compiles.
-        (void)val; // TODO: Delete this line
+        auto lb = std::lower_bound(data.begin(),data.end(),val,this->compare);
+        // if it's the most extreme one, insert at back
+        if (lb == data.end())
+            data.push_back(val);
+        else{ // insert at middle [.begin(), lb), [lb, .end())
+            std::vector<TYPE> front(data.begin(),lb);
+            std::vector<TYPE> end(lb,data.end());
+            front.push_back(val);
+            front.reserve(front.size() + end.size());
+            front.insert(front.end(),end.begin(),end.end());
+            data = front;
+        }
     } // push()
 
 
@@ -66,6 +88,7 @@ public:
     // Runtime: Amortized O(1)
     virtual void pop() {
         // TODO: Implement this function
+        data.pop_back();
     } // pop()
 
 
@@ -77,10 +100,8 @@ public:
     // Runtime: O(1)
     virtual const TYPE &top() const {
         // TODO: Implement this function
+        return data[data.size() - 1];
 
-        // These lines are present only so that this provided file compiles.
-        static TYPE temp; // TODO: Delete this line
-        return temp;      // TODO: Delete or change this line
     } // top()
 
 
@@ -105,6 +126,7 @@ public:
     // Runtime: O(n log n)
     virtual void updatePriorities() {
         // TODO: Implement this function
+        std::sort(data.begin(),data.end(),this->compare);
     } // updatePriorities()
 
 
@@ -114,6 +136,8 @@ private:
 
     // TODO: Add any additional member functions you require here.
     //       You are NOT allowed to add any new member variables.
+
+
 
 }; // SortedPQ
 

@@ -20,6 +20,8 @@ public:
     explicit BinaryPQ(COMP_FUNCTOR comp = COMP_FUNCTOR()) :
         BaseClass{ comp } {
         // TODO: Implement this function, or verify that it is already done
+
+        /// already done
     } // BinaryPQ
 
 
@@ -31,10 +33,20 @@ public:
         BaseClass{ comp } {
         // TODO: Implement this function
 
-        // These lines are present only so that this provided file compiles.
-        (void)start; // TODO: Delete this line
-        (void)end;   // TODO: Delete this line
+        for(auto iter = start; iter != end; iter ++){
+            data.push_back(*iter);
+        }
+        heapify();
     } // BinaryPQ
+
+    /// DEBUG FUNCTION
+    BinaryPQ(const std::vector<TYPE>& v, COMP_FUNCTOR comp = COMP_FUNCTOR()):
+        BaseClass{ comp } {
+            std::vector<TYPE> temp(v.begin(),v.end());
+            data = temp;
+            heapify();
+        }
+
 
 
     // Description: Destructor doesn't need any code, the data vector will
@@ -49,6 +61,7 @@ public:
     // Runtime: O(n)
     virtual void updatePriorities() {
         // TODO: Implement this function.
+        heapify();
     } // updatePriorities()
 
 
@@ -56,9 +69,8 @@ public:
     // Runtime: O(log(n))
     virtual void push(const TYPE &val) {
         // TODO: Implement this function.
-
-        // This line is present only so that this provided file compiles.
-        (void)val; // TODO: Delete this line
+        data.push_back(val);
+        fixUp(data.size());
     } // push()
 
 
@@ -71,6 +83,9 @@ public:
     // Runtime: O(log(n))
     virtual void pop() {
         // TODO: Implement this function.
+        std::swap(getElement(1), getElement(data.size()));
+        data.pop_back();
+        fixDown(1);
     } // pop()
 
 
@@ -81,10 +96,7 @@ public:
     // Runtime: O(1)
     virtual const TYPE &top() const {
         // TODO: Implement this function.
-
-        // These lines are present only so that this provided file compiles.
-        static TYPE temp; // TODO: Delete this line
-        return temp;      // TODO: Delete or change this line
+        return data[data.size() - 1];
     } // top()
 
 
@@ -92,8 +104,7 @@ public:
     // Runtime: O(1)
     virtual std::size_t size() const {
         // TODO: Implement this function. Might be very simple,
-        // depending on your implementation.
-        return 0; // TODO: Delete or change this line
+        return data.size();
     } // size()
 
 
@@ -101,8 +112,7 @@ public:
     // Runtime: O(1)
     virtual bool empty() const {
         // TODO: Implement this function. Might be very simple,
-        // depending on your implementation.
-        return true; // TODO: Delete or change this line
+        return data.empty();
     } // empty()
 
 
@@ -115,6 +125,46 @@ private:
 
     // TODO: Add any additional member functions you require here. For
     //       instance, you might add fixUp() and fixDown().
+
+    // Utility: getElement, O(1)
+    const TYPE &getElement(size_t idx) const{
+        return data[idx - 1];
+    }
+    TYPE &getElement(size_t idx){
+        return data[idx - 1];
+    }
+
+    // FixDown, O(log n)
+    void fixDown(size_t idx){
+        while( idx * 2 <= data.size() ){
+            size_t j = idx * 2;
+            if ( j < data.size() && this->compare(getElement(j),getElement(j+1)) )
+                j++;
+            if ( this->compare(getElement(j),getElement(idx)) )
+                break;
+            std::swap(getElement(idx), getElement(j));
+            idx = j;
+        }
+    }
+
+    // FixUp, O(log n)
+    void fixUp(size_t idx){
+        while( idx > 1 && this->compare(data[idx / 2],data[idx])){
+            std::swap(getElement(idx), getElement(idx / 2));
+            idx /= 2;
+        }
+    }
+
+    // heapify, O(n)
+    void heapify(){
+        for(size_t idx = data.size(); idx >= 1 ; idx -- ){
+            // continue at leaf node
+            if (idx * 2 > data.size())
+                continue;
+            fixDown(idx);
+        }
+    }
+
 }; // BinaryPQ
 
 

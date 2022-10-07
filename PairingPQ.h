@@ -43,7 +43,6 @@ public:
             Node *child;
             Node *sibling;
             Node *previous;
-            // TODO: Add one extra pointer (parent or previous) as desired.
     }; // Node
 
 
@@ -51,9 +50,11 @@ public:
     //              comparison functor.
     // Runtime: O(1)
     explicit PairingPQ(COMP_FUNCTOR comp = COMP_FUNCTOR()) :
-        BaseClass{ comp }, root{ nullptr }, count { 0 }{
+        BaseClass{ comp }{
         // TODO: Implement this function.
-    } // PairingPQ()
+        this->root = nullptr;
+        this->count = 0;
+    }; // PairingPQ()
 
 
     // Description: Construct a pairing heap out of an iterator range with an
@@ -63,10 +64,10 @@ public:
     PairingPQ(InputIterator start, InputIterator end, COMP_FUNCTOR comp = COMP_FUNCTOR()) :
         BaseClass{ comp } {
         // TODO: Implement this function.
-        std::vector<TYPE> storage(start,end);
+        std::deque<TYPE> storage(start,end);
         while(!storage.empty()){
-            this->push(storage.back());
-            storage.pop_back();
+            this->push(storage.front());
+            storage.pop_front();
         }
     } // PairingPQ()
 
@@ -99,6 +100,17 @@ public:
     // Runtime: O(n)
     ~PairingPQ() {
         // TODO: Implement this function.
+        if (!root) return; /// pitfall happens here !!!
+        std::deque<Node *> dest;
+        dest.push_back(root);
+        while(!dest.empty()){
+            Node *cur = dest.front();
+            if (cur->child)
+                dest.push_back(cur->child);
+            if (cur->sibling)
+                dest.push_back(cur->sibling);
+            delete cur;
+        }
     } // ~PairingPQ()
 
 
@@ -136,6 +148,7 @@ public:
         Node *leftSib = root->child;
         // TODO: remove root
         delete root;
+        root = nullptr; /// pitfall happens here !!!
         // TODO: decrease count
         count -- ;
         // TODO: if count == 1, only root get removed, then return after deleting
@@ -151,6 +164,7 @@ public:
         }
         // TODO: if after pop(), there is only one element left, then set
         //  root equal to this node and NULL previous and sibling pointer
+        merger.back()->previous = nullptr; /// pitfall happens here !!!
         if (merger.size() == 1){
             root = merger.front();
             root->previous = root->sibling = nullptr;
@@ -160,7 +174,7 @@ public:
         while(merger.size() > 1){
             Node *first = merger.front();
             merger.pop_front();
-            Node *second = merger.front;
+            Node *second = merger.front();
             merger.pop_front();
             merger.push_back(meld(first,second));
         }
@@ -176,7 +190,6 @@ public:
     // Runtime: O(1)
     virtual const TYPE &top() const {
         // TODO: Implement this function
-
         return root->elt;
     } // top()
 
@@ -223,7 +236,7 @@ public:
         auto newNode = new Node(val);
         root = (count == 0 ? newNode : meld(root,newNode));
         count ++;
-
+        return root;
     } // addNode()
 
 
@@ -272,7 +285,7 @@ private:
                 na->child = nb;
                 nb->previous = na;
             }
-            return nb;
+            return na;
         }
     }
     // NOTE: For member variables, you are only allowed to add a "root

@@ -20,20 +20,22 @@ int main(){
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
     std::uniform_int_distribution<> distr(0, 66); // define the range
-    vector<int> v;
-    SortedPQ<int> pq(v.begin(),v.end());
-    for (int i = 0; i < 10; ++i) {
-        int a = distr(gen);
-        cout << a << " ";
-        v.push_back(a);
-        pq.push(a);
-    }
-    cout << endl;
-
-    while(!pq.empty()){
-        cout << pq.top() << ' ';
-        pq.pop();
-    }
+    PairingPQ<int> v;
     return 0;
 }
 
+
+//vector<int> v;
+//SortedPQ<int> pq(v.begin(),v.end());
+//for (int i = 0; i < 10; ++i) {
+//int a = distr(gen);
+//cout << a << " ";
+//v.push_back(a);
+//pq.push(a);
+//}
+//cout << endl;
+//
+//while(!pq.empty()){
+//cout << pq.top() << ' ';
+//pq.pop();
+}

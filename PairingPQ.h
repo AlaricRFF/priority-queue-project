@@ -51,7 +51,7 @@ public:
     //              comparison functor.
     // Runtime: O(1)
     explicit PairingPQ(COMP_FUNCTOR comp = COMP_FUNCTOR()) :
-        BaseClass{ comp } {
+        BaseClass{ comp }, root{ nullptr }, count { 0 }{
         // TODO: Implement this function.
     } // PairingPQ()
 
@@ -63,10 +63,11 @@ public:
     PairingPQ(InputIterator start, InputIterator end, COMP_FUNCTOR comp = COMP_FUNCTOR()) :
         BaseClass{ comp } {
         // TODO: Implement this function.
-
-        // These lines are present only so that this provided file compiles.
-        (void)start; // TODO: Delete this line
-        (void)end;   // TODO: Delete this line
+        std::vector<TYPE> storage(start,end);
+        while(!storage.empty()){
+            this->push(storage.back());
+            storage.pop_back();
+        }
     } // PairingPQ()
 
 
@@ -131,6 +132,39 @@ public:
     // TODO: make sure when the heap is empty, the root is a nullptr
     virtual void pop() {
         // TODO: Implement this function.
+        std::deque<Node*> merger;
+        Node *leftSib = root->child;
+        // TODO: remove root
+        delete root;
+        // TODO: decrease count
+        count -- ;
+        // TODO: if count == 1, only root get removed, then return after deleting
+        if (!leftSib) return;
+        merger.push_back(leftSib);
+        // TODO: add all first level siblings
+        while(leftSib->sibling){
+            Node *temp = leftSib;
+            leftSib = leftSib->sibling;
+            temp->sibling = nullptr; /// remove the sibling in order to meld
+            temp->previous = nullptr;
+            merger.push_back(leftSib);
+        }
+        // TODO: if after pop(), there is only one element left, then set
+        //  root equal to this node and NULL previous and sibling pointer
+        if (merger.size() == 1){
+            root = merger.front();
+            root->previous = root->sibling = nullptr;
+            return;
+        }
+        // TODO: after pop(),  count >= 2
+        while(merger.size() > 1){
+            Node *first = merger.front();
+            merger.pop_front();
+            Node *second = merger.front;
+            merger.pop_front();
+            merger.push_back(meld(first,second));
+        }
+        root = merger.front();
     } // pop()
 
 
@@ -143,24 +177,20 @@ public:
     virtual const TYPE &top() const {
         // TODO: Implement this function
 
-        // These lines are present only so that this provided file compiles.
-        static TYPE temp; // TODO: Delete this line
-        return temp;      // TODO: Delete or change this line
+        return root->elt;
     } // top()
 
 
     // Description: Get the number of elements in the pairing heap.
     // Runtime: O(1)
     virtual std::size_t size() const {
-        // TODO: Implement this function
-        return 0; // TODO: Delete or change this line
+        return count;
     } // size()
 
     // Description: Return true if the pairing heap is empty.
     // Runtime: O(1)
     virtual bool empty() const {
-        // TODO: Implement this function
-        return true; // TODO: Delete or change this line
+        return count == 0;
     } // empty()
 
 

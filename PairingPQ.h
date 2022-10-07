@@ -21,7 +21,7 @@ public:
             // TODO: After you add add one extra pointer (see below), be sure
             //       to initialize it here.
             explicit Node(const TYPE &val)
-                : elt{ val }, child{ nullptr }, sibling{ nullptr }
+                : elt{ val }, child{ nullptr }, sibling{ nullptr }, previous{ nullptr }
             {}
 
             // Description: Allows access to the element at that Node's
@@ -42,6 +42,7 @@ public:
             TYPE elt;
             Node *child;
             Node *sibling;
+            Node *previous;
             // TODO: Add one extra pointer (parent or previous) as desired.
     }; // Node
 
@@ -127,6 +128,7 @@ public:
     //       welcome to if you are familiar with them, you do not need to use
     //       exceptions in this project.
     // Runtime: Amortized O(log(n))
+    // TODO: make sure when the heap is empty, the root is a nullptr
     virtual void pop() {
         // TODO: Implement this function.
     } // pop()
@@ -188,11 +190,10 @@ public:
     // Runtime: O(1)
     Node* addNode(const TYPE &val) {
         // TODO: Implement this function
+        auto newNode = new Node(val);
+        root = (count == 0 ? newNode : meld(root,newNode));
+        count ++;
 
-        // This line is present only so that this provided file compiles.
-        (void)val;      // TODO: Delete this line
-
-        return nullptr; // TODO: Delete or change this line
     } // addNode()
 
 
@@ -201,7 +202,49 @@ private:
     //       require here.
     // TODO: We recommend creating a 'meld' function (see the Pairing Heap
     //       papers).
+    Node *root = nullptr;
+    size_t count = 0;
 
+
+    // meld two heap into one
+    // no parent, no sibling
+    // root points to one of these with higher priority one
+    // return the current higher priority one
+    Node *meld(Node *na, Node *nb) {
+        /// debug
+        if (na->previous || na->sibling || nb->previous || nb->sibling) {
+            std::cerr << "invalid meld!\n";
+            exit(1);
+        }
+        /// debug
+        if (this->compare(na->elt, nb->elt)) { // nb has higher priority
+            if (nb->child) {
+                Node *bChild = nb->child;
+                bChild->previous = na; // child of b has left sibling a
+                na->sibling = bChild; // bChild becomes a's right sibling
+                na->previous = nb; // b becomes a's previous
+                nb->child = na; // a becomes b's child
+            } else {
+                nb->child = na;
+                na->previous = nb;
+            }
+            return nb;
+        }
+        else{
+            if (na->child){
+                Node *aChild = na->child;
+                aChild->previous = nb;
+                nb->sibling = aChild;
+                nb->previous = na;
+                na->child = nb;
+            }
+            else{
+                na->child = nb;
+                nb->previous = na;
+            }
+            return nb;
+        }
+    }
     // NOTE: For member variables, you are only allowed to add a "root
     //       pointer" and a "count" of the number of nodes. Anything else
     //       (such as a deque) should be declared inside of member functions

@@ -2,3 +2,4 @@
 *.txt
 .idea*
 *.tar.gz
+*.dsYM*

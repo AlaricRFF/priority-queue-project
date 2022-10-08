@@ -270,6 +270,7 @@ public:
     // Runtime: As discussed in reading material.
     void updateElt(Node* node, const TYPE &new_value) {
         // TODO: Implement this function
+        if (!node) return;
         node->elt = new_value;
         if (node == root) return;
         // todo: is it the leftmost ?
@@ -311,7 +312,7 @@ public:
         auto newNode = new Node(val);
         root = (count == 0 ? newNode : meld(root,newNode));
         count ++;
-        return root;
+        return newNode;
     } // addNode()
 
 

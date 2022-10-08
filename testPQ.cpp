@@ -1,5 +1,4 @@
-// Project identifier: 9504853406CBAC39EE89AA3AD238AA12CA198043
-
+// Project identifier:9504853406CBAC39EE89AA3AD238AA12CA198043
 /*
  * Compile this test against your .h files to make sure they compile. We
  * suggest adding to this file or creating your own test cases to test your
@@ -150,7 +149,7 @@ void testUpdatePriorities() {
 }
 
 
-// Test the pairing heap's range-based constructor, copy constructor,
+// Test the pushT heap's range-based constructor, copy constructor,
 //   copy-assignment operator, and destructor
 // TODO: Test other operations specific to this PQ type.
 void testPairing() {
@@ -192,7 +191,7 @@ void testPairing() {
 
         // TODO: Add more code to test addNode, updateElt, etc.
 
-        // That { above creates a scope, and our pairing heaps will fall out of
+        // That { above creates a scope, and our pushT heaps will fall out of
         //   scope at the matching } below.
         std::cout << "Calling destructors" << std::endl;
     }
@@ -223,19 +222,45 @@ void testPriorityQueue<PairingPQ>() {
 int main(){
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
-    std::uniform_int_distribution<> distr(0, 6666); // define the range
+    std::uniform_int_distribution<> distr(0, 16); // define the range
     vector<int> v;
-    for (int i = 0; i < 10000; ++i) {
-        int a = distr(gen);
-        cout << a << " ";
-        v.push_back(a);
-    }
-    PairingPQ<int> p(v.begin(),v.end());
-    while(!p.empty()){
-        cout << p.top() << ' ';
-        p.pop();
+    PairingPQ<int*,IntPtrComp> pushT;
+//    for (int i = 0; i < 6; ++i) {
+//        int a = distr(gen);
+//        cout << a << " ";
+//        v.push_back(a);
+//        pushT.push(&v[i]);
+//    }
+    v.push_back(6);
+    v.push_back(8);
+    v.push_back(3);
+    v.push_back(9);
+    v.push_back(1);
+    v.push_back(16);
+    for (int i = 0; i < 6; ++i) {
+        pushT.push(&v[i]);
     }
     cout << endl;
+    while (!pushT.empty()){
+        cout << *pushT.top() <<' ';
+        pushT.pop();
+    }
+
+
+//    cout << endl;
+//    PairingPQ<int> p(v.begin(),v.end());
+//    PairingPQ copy(p);
+//    cout << copy.size() << endl;
+//    while(!copy.empty()){
+//        cout << copy.top() << ' ' << copy.size() << endl;
+//        copy.pop();
+//    }
+//    cout << '\n';
+//    while(!p.empty()){
+//        cout << p.top() << ' ' << p.size() << endl;
+//        p.pop();
+//    }
+//    cout << endl;
     return 0;
 }
 

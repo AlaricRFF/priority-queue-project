@@ -1,4 +1,4 @@
-// Project identifier: 0E04A31E0D60C01986ACB20081C9D8722A1899B6
+// Project identifier: 9504853406CBAC39EE89AA3AD238AA12CA198043
 
 #ifndef PAIRINGPQ_H
 #define PAIRINGPQ_H
@@ -90,18 +90,28 @@ public:
                 dest.push_back(cur->child);
             if (cur->sibling)
                 dest.push_back(cur->sibling);
-            Node *newNode = new Node(cur->elt);
-            this->push(newNode);
+            this->push(cur->elt);
         }
-
     } // PairingPQ()
 
 
     // Description: Copy assignment operator.
     // Runtime: O(n)
     PairingPQ &operator=(const PairingPQ &rhs) {
+//        std::deque<Node *> dest;
+//        if (!rhs.root) return *this; /// if 'other' is empty, return directly
+//        dest.push_back(rhs.root);
+//        while(!dest.empty()){
+//            Node *cur = dest.front();
+//            dest.pop_front();
+//            if (cur->child)
+//                dest.push_back(cur->child);
+//            if (cur->sibling)
+//                dest.push_back(cur->sibling);
+//            this->push(cur->elt);
+//        }
         // TODO: Implement this function.
-        PairingPQ<TYPE> temp(rhs);
+        PairingPQ temp(rhs);
         this->compare = rhs.compare;
         std::swap(this->count,temp.count);
         std::swap(this->root,temp.root);
@@ -151,7 +161,11 @@ public:
             if (cur->sibling)
                 dest.push_back(cur->sibling);
             cur->sibling = cur->child = cur->previous = nullptr;
-            root = meld(root,cur);
+            if (!root)
+                root = cur;
+            else{
+                root = meld(root,cur);
+            }
         }
     } // updatePriorities()
 
@@ -239,6 +253,13 @@ public:
     } // empty()
 
 
+    /// debug
+//    Node *returnRoot() const{
+//        Node *r = root->child->sibling;
+//        return root->child->child->sibling;
+//    }
+    /// debug
+
     // Description: Updates the priority of an element already in the pairing
     //              heap by replacing the element refered to by the Node with
     //              new_value. Must maintain pairing heap invariants.
@@ -308,10 +329,10 @@ private:
     // return the current higher priority one
     Node *meld(Node *na, Node *nb) {
         /// debug
-        if (na->previous || na->sibling || nb->previous || nb->sibling) {
-            std::cerr << "invalid meld!\n";
-            exit(-1);
-        }
+//        if (na->previous || na->sibling || nb->previous || nb->sibling) {
+//            std::cerr << "invalid meld!\n";
+//            exit(-1);
+//        }
         /// debug
         if (this->compare(na->elt, nb->elt)) { // nb has higher priority
             if (nb->child) {

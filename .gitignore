@@ -1,3 +1,4 @@
 /cmake*
 *.txt
 .idea*
+*.tar.gz

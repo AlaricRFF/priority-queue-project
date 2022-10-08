@@ -28,13 +28,13 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-
+#include <random>
 #include "BinaryPQ.h"
 #include "Eecs281PQ.h"
 #include "PairingPQ.h"
 #include "SortedPQ.h"
 #include "UnorderedPQ.h"
-
+using namespace std;
 
 // A type for representing priority queue types at runtime
 enum class PQType {
@@ -220,7 +220,26 @@ void testPriorityQueue<PairingPQ>() {
     testPairing();
 }
 
+int main(){
+    std::random_device rd; // obtain a random number from hardware
+    std::mt19937 gen(rd()); // seed the generator
+    std::uniform_int_distribution<> distr(0, 6666); // define the range
+    vector<int> v;
+    for (int i = 0; i < 10000; ++i) {
+        int a = distr(gen);
+        cout << a << " ";
+        v.push_back(a);
+    }
+    PairingPQ<int> p(v.begin(),v.end());
+    while(!p.empty()){
+        cout << p.top() << ' ';
+        p.pop();
+    }
+    cout << endl;
+    return 0;
+}
 
+/*
 int main() {
     std::vector<PQType> const types {
         PQType::Unordered,
@@ -258,3 +277,4 @@ int main() {
 
     return 0;
 }
+*/

@@ -18,7 +18,7 @@ int main(){
     std::mt19937 gen(rd()); // seed the generator
     std::uniform_int_distribution<> distr(0, 6666); // define the range
     vector<int> v;
-    for (int i = 0; i < 10000; ++i) {
+    for (int i = 0; i < 100; ++i) {
         int a = distr(gen);
         cout << a << " ";
         v.push_back(a);
@@ -44,9 +44,6 @@ int main(){
         pairing.pop();
         bigger = smaller;
     }
-    cout << endl;
-    bigger = v.back();
-    v.pop_back();
     return 0;
 }
 
@@ -64,3 +61,4 @@ int main(){
 //while(!pq.empty()){
 //cout << pq.top() << ' ';
 //pq.pop();
+

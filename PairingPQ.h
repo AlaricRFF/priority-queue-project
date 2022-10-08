@@ -64,11 +64,14 @@ public:
     PairingPQ(InputIterator start, InputIterator end, COMP_FUNCTOR comp = COMP_FUNCTOR()) :
         BaseClass{ comp } {
         // TODO: Implement this function.
-        std::deque<TYPE> storage(start,end);
-        while(!storage.empty()){
-            this->push(storage.front());
-            storage.pop_front();
+        for(auto i = start; i != end; i++){
+            this->push(*i);
         }
+//        std::deque<TYPE> storage(start,end);
+//        while(!storage.empty()){
+//            this->push(storage.front());
+//            storage.pop_front();
+//        }
     } // PairingPQ()
 
 
@@ -77,8 +80,20 @@ public:
     PairingPQ(const PairingPQ &other) :
         BaseClass{ other.compare } {
         // TODO: Implement this function.
-        // NOTE: The structure does not have to be identical to the original,
-        //       but it must still be a valid pairing heap.
+        std::deque<Node *> dest;
+        if (!other.root) return; /// if 'other' is empty, return directly
+        dest.push_back(other.root);
+        while(!dest.empty()){
+            Node *cur = dest.front();
+            dest.pop_front();
+            if (cur->child)
+                dest.push_back(cur->child);
+            if (cur->sibling)
+                dest.push_back(cur->sibling);
+            Node *newNode = new Node(cur->elt);
+            this->push(newNode);
+        }
+
     } // PairingPQ()
 
 
@@ -86,12 +101,10 @@ public:
     // Runtime: O(n)
     PairingPQ &operator=(const PairingPQ &rhs) {
         // TODO: Implement this function.
-        // HINT: Use the copy-swap method from the "Arrays and Containers"
-        //       lecture.
-
-        // This line is present only so that this provided file compiles.
-        (void)rhs; // TODO: Delete this line
-
+        PairingPQ<TYPE> temp(rhs);
+        this->compare = rhs.compare;
+        std::swap(this->count,temp.count);
+        std::swap(this->root,temp.root);
         return *this;
     } // operator=()
 
@@ -105,12 +118,15 @@ public:
         dest.push_back(root);
         while(!dest.empty()){
             Node *cur = dest.front();
+            dest.pop_front();
             if (cur->child)
                 dest.push_back(cur->child);
             if (cur->sibling)
                 dest.push_back(cur->sibling);
             delete cur;
         }
+        root = nullptr;
+        count = 0;
     } // ~PairingPQ()
 
 
@@ -121,6 +137,22 @@ public:
     // Runtime: O(n)
     virtual void updatePriorities() {
         // TODO: Implement this function.
+        if (!root) return; /// no element, return
+        /// during the whole process, count doesn't change !!!
+        Node *oddRoot = root;
+        root = nullptr;
+        std::deque<Node*> dest;
+        dest.push_back(oddRoot);
+        while(!dest.empty()){
+            Node *cur = dest.front();
+            dest.pop_front();
+            if (cur->child)
+                dest.push_back(cur->child);
+            if (cur->sibling)
+                dest.push_back(cur->sibling);
+            cur->sibling = cur->child = cur->previous = nullptr;
+            root = meld(root,cur);
+        }
     } // updatePriorities()
 
 
@@ -217,10 +249,32 @@ public:
     // Runtime: As discussed in reading material.
     void updateElt(Node* node, const TYPE &new_value) {
         // TODO: Implement this function
+        node->elt = new_value;
+        if (node == root) return;
+        // todo: is it the leftmost ?
+        if (node->previous->child == node){ /// yes, I'm the leftmost !
+            /// testing, maybe dont need this @@
+            if (!this->compare(node->previous->elt,node->elt))
+                return;
+            /// testing, maybe dont need this @@
+            Node *parent = node->previous;
+            Node *oldSib = node->sibling;
+            parent->child = oldSib;
+            if (oldSib) /// NOTE: nullptr !!!
+                oldSib->previous = parent;
+            node->sibling = node->previous = nullptr;
+            root = meld(root,node);
+        }
+        else{
+            Node *prevSib = node->previous;
+            Node *pastSib = node->sibling;
+            prevSib->sibling = pastSib;
+            if (pastSib) /// NOTE: nullptr !!!
+                pastSib->previous = prevSib;
+            node->sibling = node->previous = nullptr;
+            root = meld(root,node);
+        }
 
-        // These lines are present only so that this provided file compiles.
-        (void)node;      // TODO: Delete this line
-        (void)new_value; // TODO: Delete this line
     } // updateElt()
 
 
@@ -251,13 +305,12 @@ private:
 
     // meld two heap into one
     // no parent, no sibling
-    // root points to one of these with higher priority one
     // return the current higher priority one
     Node *meld(Node *na, Node *nb) {
         /// debug
         if (na->previous || na->sibling || nb->previous || nb->sibling) {
             std::cerr << "invalid meld!\n";
-            exit(1);
+            exit(-1);
         }
         /// debug
         if (this->compare(na->elt, nb->elt)) { // nb has higher priority

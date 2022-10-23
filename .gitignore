@@ -3,3 +3,5 @@
 .idea*
 *.tar.gz
 *.dsYM*
+*.DS_Store
+*.zip
